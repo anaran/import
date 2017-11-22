@@ -13,9 +13,12 @@ try {
   if (!customElements.get('my-jot')) {
     customElements.define('my-jot', typpo.Jot);
   }
+  // devtools console reports:
   // TypeError: "this" object does not implement interface HTMLElement.
-  // let myJot = document.createElement('my-jot');
-  let myJot = new typpo.Jot;
+  // Error in b is not caught in a.
+  let myJot = document.createElement('my-jot');
+  // Properly catching error in b:
+  // let myJot = new typpo.Jot;
   document.body.appendChild(
     myJot
   );
