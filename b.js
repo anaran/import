@@ -12,7 +12,7 @@ class Jot extends HTMLElement {
       <pre contenteditable="true">
       Jot
       </pre>
-      <textarea>textarea</textarea>
+      <textarea></textarea>
       <style>
       pre {
         opacity: 0.8;
