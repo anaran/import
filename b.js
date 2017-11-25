@@ -8,15 +8,17 @@ class Jot extends HTMLElement {
       // Trying to extent HTMLPreElement I get:
       // VM1330:1 Uncaught TypeError: Illegal constructor
       super();
-      this._shadow = this.attachShadow({ mode: 'open' });
-      this._shadow.innerHTML = `
+      this._template = document.createElement('template');
+      this._template.innerHTML = `
         <pre contenteditable="true">
         Jot
       </pre>
         <textarea placeholder="typing here crashes browser tab"></textarea>
         <input type="text" placeholder="On Android characters get duplicated">
         <!--
-        -->
+        <template>
+        </template>
+      -->
         <style>
         pre {
           opacity: 0.8;
@@ -29,6 +31,8 @@ class Jot extends HTMLElement {
         }
       </style>
         `;
+      this._shadow = this.attachShadow({ mode: 'open' });
+      this._shadow.appendChild(document.importNode(this._template.content, 'deep'));
       this._pre = this._shadow.firstElementChild;
       this._ta = this._shadow.querySelector('textarea');
     }
