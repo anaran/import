@@ -1,7 +1,5 @@
 'use strict';
 
-let b = 2;
-
 class Jot extends HTMLElement {
   constructor() {
     try {
@@ -9,28 +7,47 @@ class Jot extends HTMLElement {
       // VM1330:1 Uncaught TypeError: Illegal constructor
       super();
       this._shadow = this.attachShadow({ mode: 'open' });
-      this._shadow.innerHTML = `
-        <pre contenteditable="true">
-        Jot
-      </pre>
-        <textarea placeholder="typing here crashes browser tab"></textarea>
-        <input type="text" placeholder="On Android characters get duplicated">
-        <!--
-        -->
-        <style>
-        pre {
-          opacity: 0.8;
-          position: fixed;
-          top: 25%;
-          left: 25%;
-          /*width: 50%;
-            height: 50%;*/
-          z-idex: 1000;
-        }
-      </style>
-        `;
-      this._pre = this._shadow.firstElementChild;
-      this._ta = this._shadow.querySelector('textarea');
+      this._pre = this._shadow.appendChild(document.createElement('pre'));
+      this.contentEditable = true;
+      this._pre.contentEditable = true;
+      this._ta = this._shadow.appendChild(document.createElement('textarea'));
+      this._input = this._shadow.appendChild(document.createElement('input'));
+      this._div = this._shadow.appendChild(document.createElement('span'));
+      this._div.addEventListener('input', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log(event);
+      }, true);
+      this._div.addEventListener('input', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        console.log(event);
+      }, false);
+      this._div.contentEditable = true;
+      this._div.textContent = 'hit me';
+      this._style = this._shadow.appendChild(document.createElement('style'));
+      // this._shadow.innerHTML = `
+      //   <pre contenteditable="true">
+      //   Jot
+      // </pre>
+      //   <textarea placeholder="typing here crashes browser tab"></textarea>
+      //   <input type="text" placeholder="On Android characters get duplicated">
+      //   <!--
+      //   -->
+      //   <style>
+      //   pre {
+      //     opacity: 0.8;
+      //     position: fixed;
+      //     top: 25%;
+      //     left: 25%;
+      //     /*width: 50%;
+      //       height: 50%;*/
+      //     z-idex: 1000;
+      //   }
+      // </style>
+      //   `;
+      // this._pre = this._shadow.firstElementChild;
+      // this._ta = this._shadow.querySelector('textarea');
     }
     catch(e) {
       console.log(JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
@@ -51,8 +68,7 @@ class Jot extends HTMLElement {
   }
 }
 
-// export default b;
-
-export default  { Jot, b };
-
-// window.alert('my-jot: look!');
+if (!customElements.get('my-jot')) {
+  customElements.define('my-jot', Jot);
+  document.body.appendChild(new Jot);
+}
