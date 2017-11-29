@@ -42,10 +42,12 @@ class Jot extends HTMLElement {
         */
       section {
         background-color: silver;
+        height: 80%;
+        left: 10%;
         opacity: 0.9;
         position: fixed;
-        top: 25%;
-        left: 25%;
+        top: 10%;
+        width: 80%;
         z-idex: 1000;
       }
       span {
