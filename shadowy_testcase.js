@@ -13,13 +13,15 @@ function reportError(error) {
   reportingNode.textContent += JSON.stringify(error, getAllPropertyNames(error), 2);
 }
 
-class Jot extends HTMLElement {
-  constructor() {
-    try {
-      super();
-      this._shadow = this.attachShadow({ mode: 'open' });
-      // this._shadow = this;
-      this._shadow.innerHTML = `
+// Avoid error "redeclaration of Jot".
+{
+  class Jot extends HTMLElement {
+    constructor() {
+      try {
+        super();
+        this._shadow = this.attachShadow({ mode: 'open' });
+        // this._shadow = this;
+        this._shadow.innerHTML = `
         <section>
         <span>&times;</span>
         <pre contenteditable="true">
@@ -40,46 +42,54 @@ class Jot extends HTMLElement {
            using section as a workaround. See also
            https://bugzilla.mozilla.org/show_bug.cgi?id=992245
         */
-      section {
-        background-color: silver;
+      :host {
         height: 80%;
         left: 10%;
-        opacity: 0.9;
         position: fixed;
         top: 10%;
         width: 80%;
-        z-idex: 1000;
-      }
-      span {
-        right: 0;
-        top: 0;
-        position: absolute;
       }
       </style>
         `;
-      this._close = this._shadow.querySelector('span');
-      this._pre = this._shadow.querySelector('pre');
-      this._ta = this._shadow.querySelector('textarea');
-      this._div = this._shadow.querySelector('div');
-      this._div.textContent = 'characters do not get inserted';
-      this._pre.addEventListener('focus', event => {
-        let s = window.getSelection();
-        s.selectAllChildren(event.target);
-      });
-      this._close.addEventListener('click', e => {
-        this.parentElement.removeChild(this);
-      });
+        this._close = this._shadow.querySelector('span');
+        this._pre = this._shadow.querySelector('pre');
+        this._ta = this._shadow.querySelector('textarea');
+        this._div = this._shadow.querySelector('div');
+        this._div.textContent = 'characters do not get inserted';
+        this._pre.addEventListener('focus', event => {
+          let s = window.getSelection();
+          s.selectAllChildren(event.target);
+        });
+        this._close.addEventListener('click', e => {
+          this.parentElement.removeChild(this);
+        });
+      }
+      catch(e) {
+        reportError(e);
+      }
     }
-    catch(e) {
-      reportError(e);
-    }
-  }
-  connectedCallback() {
-    try {
-      this._pre.textContent = `# ${document.title}\n## ${document.URL}\n\n${window.getSelection().toString()}\n`;
-    }
-    catch(e) {
-      reportError(e);
+    connectedCallback() {
+      try {
+        let s = typeof window !== 'undefined' && window.getSelection();
+        this._pre.textContent = `# ${document.title}\n## ${document.URL}\n\n${s.toString()}\n`;
+        if (s) {
+          let rangeLinks = [];
+          for (let i = 0; i < s.rangeCount; i++) {
+            let rc = s.getRangeAt(i).cloneContents();
+            rc.querySelectorAll
+              && Array.prototype.forEach.call(rc.querySelectorAll('a[href]'), (value) => {
+                rangeLinks.push(`[${value.textContent || value.href}](${value.href})`);
+              });
+          }
+          rangeLinks.forEach(link => {
+            this._pre.textContent += `\n${link}`;
+          });
+        }
+        console.log(this._pre.textContent);
+      }
+      catch(e) {
+        reportError(e);
+      }
     }
   }
 }
@@ -94,11 +104,15 @@ try {
   if (!customElements.get('my-jot')) {
     customElements.define('my-jot', Jot);
     // document.body.appendChild(new Jot);
-    document.body.appendChild(document.createElement('my-jot'));
   }
+  let myJot = document.createElement('my-jot');
+  // let doc = window.open('', '_blank').document;
+  // doc.title = 'my-jot';
+  // doc.body.appendChild(myJot);
+  document.body.firstElementChild.appendChild(myJot);
+  myJot.scrollIntoView({block: "center", inline: "center"});
   // }
 }
 catch(e) {
   reportError(e);
 }
-// });
