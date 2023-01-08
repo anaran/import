@@ -1,5 +1,7 @@
 'use strict';
-
+//
+// selection_to_punchcard.js
+//
 function getAllPropertyNames(obj, props = []) {
   if (obj.constructor.name == 'Object') {
     return props.length ? props : null;
